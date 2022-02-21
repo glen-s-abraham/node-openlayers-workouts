@@ -5,7 +5,12 @@ import OSM from 'ol/source/OSM';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import Draw from 'ol/interaction/Draw';
+import Modify from 'ol/interaction/Modify';
 import GeoJSON from 'ol/format/GeoJSON';
+import Feature from 'ol/Feature';
+import Polygon from 'ol/geom/Polygon';
+
+let savedFeatures = [];
 
 const sendToServer = (data)=>{
   fetch('http://127.0.0.1:8000/api/uploadShape', {
@@ -22,6 +27,11 @@ const sendToServer = (data)=>{
   .catch((error) => {
     console.error('Error:', error);
   });
+}
+
+const getDataFromServer = async ()=>{
+  savedFeatures =  await fetch('http://127.0.0.1:8000/api/uploadShape')
+    .then(response => response.json())
 }
 
 const map = new Map({
@@ -48,6 +58,12 @@ map.addInteraction(new Draw({
   source:vectorSource
 }))
 
+const modify = new Modify({
+  source:vectorSource
+})
+
+map.addInteraction(modify);
+
 vectorSource.on("addfeature",e=>{
   const feature = e.feature;
   let writer = new GeoJSON();
@@ -56,3 +72,21 @@ vectorSource.on("addfeature",e=>{
 })
 
 map.addLayer(vectorLayer);
+
+window.addEventListener("load",async (e)=>{
+  await getDataFromServer();
+  savedFeatures.forEach(f=>{
+    const feature = new Feature({
+      geometry:new Polygon(f.geometry.coordinates),
+      type:f.type,
+      _id:f._id
+    })
+    vectorSource.addFeature(feature);
+    
+  })
+  
+})
+
+
+
+
