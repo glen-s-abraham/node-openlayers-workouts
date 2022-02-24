@@ -10,7 +10,10 @@ exports.getData = async (req,res,next)=>{
     res.status(200).json(features);
 }
 
-exports.updateData=(req,res,next)=>{
-    console.log(req.body);
-    return res.status(200).json({"status":"success"});
+exports.updateData=async (req,res,next)=>{
+    const _id = req.id
+    const data = req.body
+    const features = await Feature.findByIdAndUpdate(req.params.id,req.body)
+    return res.status(200).json({"status":"success"})
 }
+
