@@ -4,11 +4,14 @@ import FeatureModel from "../model/Feature";
 class FeatureService{
     featureModel = new FeatureModel();
     async saveFeature(feature){
-        if(!feature.values_._id){
+        console.log(feature)
+        if(!feature.values_._id){//try getters
             let writer = new GeoJSON();
             let data = writer.writeFeatureObject(feature)
+            console.log(data);
             const res=await this.featureModel.saveFeature(data);
             feature.values_._id=res._id
+            console.log(feature);
           }
     }
 
