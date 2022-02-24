@@ -9,30 +9,11 @@ import Modify from 'ol/interaction/Modify';
 import GeoJSON from 'ol/format/GeoJSON';
 import Feature from 'ol/Feature';
 import Polygon from 'ol/geom/Polygon';
+import FeatureController from './services/FeatureService';
+import FeatureService from './services/FeatureService';
 
-let savedFeatures = [];
 
-const sendToServer = (data)=>{
-  fetch('http://127.0.0.1:8000/api/uploadShape', {
-  method: 'POST', // or 'PUT'
-  headers: {
-    'Content-Type': 'application/json',
-  },
-    body: JSON.stringify(data),
-  })
-  .then(response => response.json())
-  .then(data => {
-  console.log('Success:', data);
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  });
-}
-
-const getDataFromServer = async ()=>{
-  savedFeatures =  await fetch('http://127.0.0.1:8000/api/uploadShape')
-    .then(response => response.json())
-}
+const featureService = new FeatureService();
 
 const map = new Map({
   target: 'map',
@@ -47,34 +28,9 @@ const map = new Map({
   })
 });
 
-
-const vectorSource = new VectorSource();
-const vectorLayer = new VectorLayer({
-  source:vectorSource
-});
-
-map.addInteraction(new Draw({
-  type:'Polygon',
-  source:vectorSource
-}))
-
-const modify = new Modify({
-  source:vectorSource
-})
-
-map.addInteraction(modify);
-
-vectorSource.on("addfeature",e=>{
-  const feature = e.feature;
-  let writer = new GeoJSON();
-  let data = writer.writeFeatureObject(feature)
-  sendToServer(data);
-})
-
-map.addLayer(vectorLayer);
-
 window.addEventListener("load",async (e)=>{
-  await getDataFromServer();
+  const savedFeatures = await featureService.getFeatures();
+  console.log(savedFeatures)
   savedFeatures.forEach(f=>{
     const feature = new Feature({
       geometry:new Polygon(f.geometry.coordinates),
@@ -86,6 +42,37 @@ window.addEventListener("load",async (e)=>{
   })
   
 })
+
+
+const vectorSource = new VectorSource();
+const vectorLayer = new VectorLayer({
+  source:vectorSource
+});
+
+const draw = new Draw({
+  type:'Polygon',
+  source:vectorSource
+});
+const modify = new Modify({
+  source:vectorSource
+});
+
+
+map.addInteraction(draw);
+map.addInteraction(modify);
+
+modify.on("modifyend",e=>{
+  const modifiedfeature=e.features.getArray()[0];
+  featureService.updateFeature(modifiedfeature);
+})
+
+vectorSource.on("addfeature",e=>{
+  featureService.saveFeature(e.feature);
+})
+
+map.addLayer(vectorLayer);
+
+
 
 
 
