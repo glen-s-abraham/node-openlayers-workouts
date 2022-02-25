@@ -2,7 +2,8 @@ import {build} from '../utils/featureBuilder';
 import {storeStyle} from '../styles/featureStyles';
 
 class StoreService{
-    addStore(store){
+    addStore(store,data){
+        store.setProperties(data);
         console.log(store);
         build(store,storeStyle);
     }
