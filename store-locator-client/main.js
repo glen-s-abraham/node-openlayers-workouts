@@ -29,6 +29,12 @@ const storelayer = new VectorLayer({
   source:storeSource
 });
 
+window.addEventListener("load",async (e)=>{
+  storeSource.addFeatures(await storeService.getStores())
+
+   
+})
+
 const storeDraw = new Draw({
   type:'Point',
   source:storeSource
@@ -46,24 +52,26 @@ map.addInteraction(storeDraw);
 map.addInteraction(storeModify);
 map.addInteraction(storeSelect);
 
+
 storeSource.on('addfeature',(evt)=>{
-  showAttributeWindow();
-  document.querySelector('#attribute-submit').addEventListener("click",()=>{
-    let data={}
-    data['name']=document.querySelector('#name').value
-    data['owner']=document.querySelector('#owner').value
-    data['contact']=document.querySelector('#contact').value
-    console.log(data);
-    hideAttributeWindow();
-    
-    storeService.addStore(evt.feature,data);
-  })
-  document.querySelector('#attribute-cancel').addEventListener("click",()=>{
-    const f = new Feature({
-      geometry:evt.feature.getGeometry()
+  console.log("addfeature");
+  if(!evt.feature.getProperties().name){
+    console.log("new feature")
+    showAttributeWindow();
+    document.querySelector('#attribute-submit').addEventListener("click",()=>{
+      let data={}
+      data['name']=document.querySelector('#name').value
+      data['owner']=document.querySelector('#owner').value
+      data['contact']=document.querySelector('#contact').value
+      hideAttributeWindow();
+      
+      storeService.addStore(evt.feature,data);
     })
-    hideAttributeWindow();
-  })
+    document.querySelector('#attribute-cancel').addEventListener("click",()=>{
+      hideAttributeWindow();
+    })
+  }
+  
   
 })
 
