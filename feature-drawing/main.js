@@ -14,7 +14,7 @@ import FeatureController from './services/FeatureService';
 import FeatureService from './services/FeatureService';
 import AmplifierService from './services/AmplifierService';
 import Point from 'ol/geom/Point';
-
+import { amplifierStyle } from './styles/styles';
 
 const featureService = new FeatureService();
 const amplifierService = new AmplifierService();
@@ -31,6 +31,7 @@ const  getAllAmplifiers=async ()=>{
       type:a.type,
       _id:a._id
     })
+    //amplifier.setStyle(amplifierStyle);
     amplifierSource.addFeature(amplifier);
   })
 }
@@ -118,11 +119,14 @@ featureSelect.on("select",async (e)=>{
         type:a.type,
         _id:a._id
       })
+      amplifier.setStyle(amplifierStyle);
       amplifierSource.addFeature(amplifier);
     })
   }
     
 })
+
+
 
 featuremodify.on("modifyend",e=>{
   const modifiedfeature=e.features.getArray()[0];
