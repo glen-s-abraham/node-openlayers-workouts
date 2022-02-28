@@ -7,8 +7,9 @@ html, body {
 #map {
   position: absolute;
   top: 0;
+  left: 5%;
   bottom: 0;
-  width: 100%;
+  width: 95%;
 }
 .attribute-wrapper{
   position: absolute;
@@ -17,7 +18,7 @@ html, body {
   left: 0;
   top: 0;
   background-color: black;
-  z-index: 1;
+  z-index: 2;
   opacity: 0.5;
 }
 
@@ -26,12 +27,32 @@ html, body {
   width: 50%;
   height: 60%;
   background-color: white;
-  z-index: 2;
+  z-index: 3;
   opacity: 1;
   top: 50%;
   left: 50%;
   transform: translate(-50%,-50%);
 }
+
+.controls{
+  position: absolute;
+  top:0%;
+  left: 0%;
+  width: 5%;
+  height: 100vh;
+  background-color: rgb(68, 66, 66);
+  z-index: 2;
+}
+
+.buttons-panel{
+  position: absolute;
+  left: 0;
+  top: 30%;
+  width: 100%;
+}
+
 .hide{
   display: none;
 }
+
+

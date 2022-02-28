@@ -9,6 +9,12 @@ import Modify from 'ol/interaction/Modify';
 import Select from 'ol/interaction/Select';
 import StoreService from './services/StoreService';
 import { showAttributeWindow,hideAttributeWindow } from './views/attributeWindow';
+
+let state = {};
+
+state["mode"]="select";
+
+
 const map = new Map({
   target: 'map',
   layers: [
@@ -31,13 +37,24 @@ const storelayer = new VectorLayer({
 
 window.addEventListener("load",async (e)=>{
   storeSource.addFeatures(await storeService.getStores())
-
-   
 })
 
-const storeDraw = new Draw({
-  type:'Point',
-  source:storeSource
+let storeDraw
+const setDrawInteraction=()=>{
+  if(state.mode==="create"){
+    storeDraw = new Draw({
+      type:'Point',
+      source:storeSource
+    })
+    map.addInteraction(storeDraw);
+  }
+    
+}
+
+document.querySelector('.controls').addEventListener("click",(evt)=>{
+  map.removeInteraction(storeDraw)
+  state.mode=evt.target.id
+  setDrawInteraction()
 })
 
 const storeModify = new Modify({
@@ -48,9 +65,27 @@ const storeSelect = new Select({
   source:storeSource
 })
 
-map.addInteraction(storeDraw);
+
 map.addInteraction(storeModify);
 map.addInteraction(storeSelect);
+
+storeSelect.on("select",(evt)=>{
+  if(state.mode=='select'){
+    //showDetails(evt.selected[0].getProperties());
+    console.log(evt.selected[0].getProperties())
+  }
+    
+  if(state.mode=='delete'){
+     //deleteStore() 
+     console.log("feature deletion")
+  }
+
+  if(state.mode=='update'){
+    //deleteStore() 
+    console.log("feature updation")
+ }
+    
+})
 
 
 storeSource.on('addfeature',(evt)=>{
