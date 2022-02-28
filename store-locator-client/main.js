@@ -1,5 +1,5 @@
 import './style.css';
-import {Feature, Map, View} from 'ol';
+import {Feature, Map, Overlay, View} from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import VectorLayer from 'ol/layer/Vector';
@@ -9,7 +9,7 @@ import Modify from 'ol/interaction/Modify';
 import Select from 'ol/interaction/Select';
 import StoreService from './services/StoreService';
 import { showAttributeWindow,hideAttributeWindow } from './views/attributeWindow';
-
+import {getDetailContent} from './views/detailsoverlay';
 let state = {};
 
 state["mode"]="select";
@@ -69,10 +69,24 @@ const storeSelect = new Select({
 map.addInteraction(storeModify);
 map.addInteraction(storeSelect);
 
+const detailsOverlay = new Overlay({
+  element:document.getElementById("details-overlay")
+})
+
 storeSelect.on("select",(evt)=>{
   if(state.mode=='select'){
     //showDetails(evt.selected[0].getProperties());
-    console.log(evt.selected[0].getProperties())
+    if(evt.selected[0]){
+      const element = detailsOverlay.getElement();
+      element.innerHTML = getDetailContent(evt.selected[0].getProperties())
+      detailsOverlay.setPosition(evt.selected[0].getGeometry().getCoordinates())
+      map.addOverlay(detailsOverlay);
+    }
+    else{
+      map.removeOverlay(detailsOverlay)
+    }
+    
+  
   }
     
   if(state.mode=='delete'){
